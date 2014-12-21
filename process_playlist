@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# Plays videos from playlist
+#
+# Copyright Â© 2013 Janne Enberg http://lietu.net/
+# This work is free. You can redistribute it and/or modify it under the
+# terms of the Do What The Fuck You Want To Public License, Version 2,
+# as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+#
+
+set -o nounset
+set -o errexit
+
+# A POSIX variable
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+verbose=0
+
+# If you want to switch omxplayer to something else, or add parameters, use these
+PLAYER="omxplayer"
+PLAYER_OPTIONS=""
+
+# Where is the playlist
+PLAYLIST_FILE="/home/pi/.playlist"
+
+
+while getopts "h?vf" opt; do
+        case "$opt" in
+        h|\?) show_help
+              exit 0
+                ;;
+        v) verbose=1
+                ;;
+        esac
+done
+
+shift $((OPTIND-1))
+
+[ "$1" = "--" ] && shift
+
+if [ "$verbose" = "1" ]; then
+        echo "verbose=$verbose, force=$force, Text: $@"
+fi
+
+if [ -z "$@" ]; then
+        PLAYLIST_FILE="$@"
+fi
+
+# Process playlist contents
+while [ true ]; do
+        # Sleep a bit so it's possible to kill this
+        sleep 1
+
+        # Do nothing if the playlist doesn't exist
+        if [ ! -f "${PLAYLIST_FILE}" ]; then
+                echo "Playlist file ${PLAYLIST_FILE} not found"
+                continue
+        fi
+
+        # Get the top of the playlist
+        file=$(cat "${PLAYLIST_FILE}" | head -n1)
+
+        # And strip it off the playlist file
+#        cat "${PLAYLIST_FILE}" | tail -n+2 > "${PLAYLIST_FILE}.new"
+#	echo "$file" >> "${PLAYLIST_FILE}.new"
+#        mv "${PLAYLIST_FILE}.new" "${PLAYLIST_FILE}"
+
+        # Skip if this is empty
+        if [ -z "${file}" ]; then
+                echo "Playlist empty or bumped into an empty entry for some reason"
+                continue
+        fi
+
+        # Check that the file exists
+        if [ ! -f "${file}" ]; then
+                echo "Playlist entry ${file} not found"
+                continue
+        fi
+
+        echo
+        echo "Playing ${file} ..."
+        echo
+	
+	stream=$(cat "$file")
+	echo
+	echo "Stream ${stream} ..."
+	echo
+
+	filename=$(basename "$file")
+	extension="${filename##*.}"
+	filename="${filename%.*}"
+	/home/pi/speech.sh "Now playing ${filename}"        
+	"${PLAYER}" ${PLAYER_OPTIONS} "${stream}"
+
+        echo
+        echo "Playback complete, continuing to next item on playlist."
+        echo
+
+        # And strip it off the playlist file
+        cat "${PLAYLIST_FILE}" | tail -n+2 > "${PLAYLIST_FILE}.new"
+        echo "$file" >> "${PLAYLIST_FILE}.new"
+        mv "${PLAYLIST_FILE}.new" "${PLAYLIST_FILE}"
+
+done

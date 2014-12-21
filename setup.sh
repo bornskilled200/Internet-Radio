@@ -1,0 +1,1 @@
+cp googletts /usr/local/bin/googletts

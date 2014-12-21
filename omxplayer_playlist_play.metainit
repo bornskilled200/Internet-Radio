@@ -1,0 +1,8 @@
+Short-Description: A playlist player that uses omxplayer
+Description: A way to make the machine play music on startup
+Exec: /usr/local/bin/omxplayer_playlist_play /var/omxplayer_playlist_play/playlist
+Required-Start: $network
+Prestart-Hook: 	echo "This is the Prestart-Hook";
+				echo "It outputs two lines.";
+Poststop-Hook: 	echo "This is the Poststop-Hook";
+				echo "All it does, is print this.";
