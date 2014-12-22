@@ -35,15 +35,19 @@ done
 
 shift $((OPTIND-1))
 
-[ "$1" = "--" ] && shift
-
-if [ "$verbose" = "1" ]; then
-        echo "verbose=$verbose, force=$force, Text: $@"
+if [ ! -z ${var+x} ]; then
+        [ "$1" = "--" ] && shift
 fi
 
-if [ -z "$@" ]; then
+
+if [ ! -z "$@" ]; then
         PLAYLIST_FILE="$@"
 fi
+
+if [ "$verbose" = "1" ]; then
+        echo "verbose=$verbose, playlist file=$PLAYLIST_FILE, Text: $@"
+fi
+
 
 # Process playlist contents
 while [ true ]; do
@@ -67,6 +71,10 @@ while [ true ]; do
         # Skip if this is empty
         if [ -z "${file}" ]; then
                 echo "Playlist empty or bumped into an empty entry for some reason"
+
+                cat "${PLAYLIST_FILE}" | tail -n+2 > "${PLAYLIST_FILE}.new"
+                echo "$file" >> "${PLAYLIST_FILE}.new"
+                mv "${PLAYLIST_FILE}.new" "${PLAYLIST_FILE}"
                 continue
         fi
 
@@ -87,13 +95,29 @@ while [ true ]; do
 
 	filename=$(basename "$file")
 	extension="${filename##*.}"
-	filename="${filename%.*}"
-	/home/pi/speech.sh "Now playing ${filename}"        
-	"${PLAYER}" ${PLAYER_OPTIONS} "${stream}"
+        filename=${filename%.*}
+        echo
+        echo "ext ${extension} ..."
+        echo
+        if [ `echo $extension | tr [:upper:] [:lower:]` =  `echo strm | tr [:upper:] [:lower:]` ]; then
+	       play=$(cat "$file")
+        else
+                play=$file
+        fi
+        echo
+        echo "Hi ${file} ..."
+        echo
+
+        /home/pi/speech.sh "Now playing ${filename}"
+	"${PLAYER}" ${PLAYER_OPTIONS} "${play}" || true
 
         echo
         echo "Playback complete, continuing to next item on playlist."
         echo
+
+
+        # Sleep a bit so it's possible to kill this
+        sleep 1
 
         # And strip it off the playlist file
         cat "${PLAYLIST_FILE}" | tail -n+2 > "${PLAYLIST_FILE}.new"

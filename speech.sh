@@ -9,13 +9,15 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 verbose=0
 force=0
+PLAYER=/usr/bin/mplayer
+PLAYER_ARGS="-ao alsa -really-quiet -volume 100"
 
 forceSay() { 
 
 	if [ "$verbose" = "1" ]; then
-		echo "Playing the url directly from the url"
+		echo "Playing the mp3 directly from the url"
 	fi
-	/usr/bin/mplayer -ao alsa -really-quiet -volume 100 "http://translate.google.com/translate_tts?tl=en&q=$*"; 
+	${PLAYER} ${PLAYER_ARGS} "http://translate.google.com/translate_tts?tl=en&q=$*"; 
 }
 
 cacheSay() { 
@@ -25,13 +27,13 @@ cacheSay() {
 		if [ "$verbose" = "1" ]; then
 			echo "Retrieving the mp3, ${hashcode}"
 		fi
-		wget –quiet -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' --output-document $hashcode "http://translate.google.com/translate_tts?tl=en&q=$*" 
+		wget –-quiet -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' --output-document $hashcode "http://translate.google.com/translate_tts?tl=en&q=$*" 
 	else
 		if [ "$verbose" = "1" ]; then
 			echo "The mp3 is already cached, ${hashcode}"
 		fi
 	fi
-	/usr/bin/mplayer -ao alsa -really-quiet -volume 100 $hashcode; 
+	${PLAYER} ${PLAYER_ARGS} $hashcode; 
 }
 
 while getopts "h?vf" opt; do

@@ -1,13 +1,12 @@
 ### BEGIN INIT INFO
 # Provides:          Internet Radio
-# Required-Start:    networking
-# Required-Stop:     networking
+# Required-Start:    $local_fs $network $syslog
+# Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: This is a test daemon
-# Description:       This is a test daemon
-#                    This provides example about how to
-#                    write a Init script.
+# Short-Description: starts the internet radio
+# Description:       starts the omxplayer_playlist_player
+#					 in /usr/local/bin/omxplayer_playlis_player
 ### END INIT INFO
 
 # Using the lsb functions to perform the operations.
