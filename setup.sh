@@ -11,6 +11,14 @@ POWEROFF_GPIO_OUT=24
 NEXT_GPIO_IN=17
 NEXT_GPIO_OUT=22
 
+# The media player for the TTS
+TTS_PLAYER=/usr/bin/mplayer
+TTS_ARGS="-ao alsa -really-quiet -volume 100"
+
+# The media player for the omxplayer_playlist_play
+PLAYLIST_PLAYER=omxplayer
+PLAYLIST_ARGS=""
+
 ###
 # For turning off the raspberry pi using it's GPIO pins
 ###
@@ -78,8 +86,8 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 verbose=0
 force=0
-PLAYER=/usr/bin/mplayer
-PLAYER_ARGS="-ao alsa -really-quiet -volume 100"
+PLAYER="'$TTS_PLAYER'"
+PLAYER_ARGS="'$TTS_ARGS'"
 
 forceSay() { 
 	[ "$verbose" = "1" ] && echo "Playing the mp3 directly from the url"
@@ -143,8 +151,8 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 verbose=0
 
 # If you want to switch omxplayer to something else, or add parameters, use these
-PLAYER="omxplayer"
-PLAYER_OPTIONS=""
+PLAYER="'$PLAYLIST_PLAYER'"
+PLAYER_OPTIONS="'$PLAYLIST_ARGS'"
 
 # Where is the playlist
 PLAYLIST_FILE="/var/omxplayer_playlist_play/playlist"
@@ -162,19 +170,13 @@ done
 
 shift $((OPTIND-1))
 
-if [ ! -z ${var+x} ]; then
-        [ "$1" = "--" ] && shift
-fi
-
+[ ! -z ${var+x} ] && [ "$1" = "--" ] && shift
 
 if [ ! -z "$@" ]; then
         PLAYLIST_FILE="$@"
 fi
 
-if [ "$verbose" = "1" ]; then
-        echo "verbose=$verbose, playlist file=$PLAYLIST_FILE, Text: $@"
-fi
-
+[ "$verbose" = "1" ] && echo "verbose=$verbose, playlist file=$PLAYLIST_FILE, Text: $@"
 
 # Process playlist contents
 while [ true ]; do
