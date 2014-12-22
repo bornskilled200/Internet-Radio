@@ -91,6 +91,7 @@ cacheSay() {
 	# Check that the file exists
 	if [ ! -f "${hashcode}" ]; then
 		[ "$verbose" = "1" ] && echo "Retrieving the mp3, ${hashcode}"
+		mkdir --parents /var/cache/googletts/
 		wget --quiet --user-agent="Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" --output-document $hashcode "http://translate.google.com/translate_tts?tl=en&q=$*"
 	else
 		[ "$verbose" = "1" ] && echo "The mp3 is already cached, ${hashcode}"
@@ -121,8 +122,8 @@ if [ "$force" = "1" ]; then
 	forceSay $*
 else
 	cacheSay $*
-fi' > /usr/local/bin/googletts
-sudo chmod 755 /usr/local/bin/googletts
+fi' > /etc/googletts
+sudo chmod 755 /etc/googletts
 
 echo '#!/usr/bin/env bash
 #
@@ -146,7 +147,7 @@ PLAYER="omxplayer"
 PLAYER_OPTIONS=""
 
 # Where is the playlist
-PLAYLIST_FILE="/var/omxplayer_playlist_player/playlist"
+PLAYLIST_FILE="/var/omxplayer_playlist_play/playlist"
 
 
 while getopts "h?vf" opt; do
@@ -229,7 +230,7 @@ while [ true ]; do
         echo "Hi ${file} ..."
         echo
 
-        googletts "Now playing ${filename}"
+        sudo /etc/googletts "Now playing ${filename}"
 	"${PLAYER}" ${PLAYER_OPTIONS} "${play}" || true
 
         echo
@@ -245,6 +246,6 @@ while [ true ]; do
         echo "$file" >> "${PLAYLIST_FILE}.new"
         mv "${PLAYLIST_FILE}.new" "${PLAYLIST_FILE}"
 
-done' > /usr/local/bin/omxplayer_playlist_play
-sudo chmod 755 /usr/local/bin/omxplayer_playlist_play
-grep -qF '/usr/local/bin/omxplayer_playlist_play &' /etc/rc.local || sudo sed -i '$ i /usr/local/bin/omxplayer_playlist_play &' /etc/rc.local
+done' > /etc/omxplayer_playlist_play
+sudo chmod 755 /etc/omxplayer_playlist_play
+grep -qF '/etc/omxplayer_playlist_play &' /etc/rc.local || sudo sed -i '$ i /etc/omxplayer_playlist_play &' /etc/rc.local

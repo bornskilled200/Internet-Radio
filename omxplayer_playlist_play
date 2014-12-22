@@ -20,7 +20,7 @@ PLAYER="omxplayer"
 PLAYER_OPTIONS=""
 
 # Where is the playlist
-PLAYLIST_FILE="/var/omxplayer_playlist_player/playlist"
+PLAYLIST_FILE="/var/omxplayer_playlist_play/playlist"
 
 
 while getopts "h?vf" opt; do
@@ -35,9 +35,8 @@ done
 
 shift $((OPTIND-1))
 
-if [ ! -z ${var+x} ]; then
-        [ "$1" = "--" ] && shift
-fi
+
+[ ! -z ${var+x} ] && [ "$1" = "--" ] && shift
 
 
 if [ ! -z "$@" ]; then
@@ -45,7 +44,7 @@ if [ ! -z "$@" ]; then
 fi
 
 if [ "$verbose" = "1" ]; then
-        echo "verbose=$verbose, playlist file=$PLAYLIST_FILE, Text: $@"
+        echo -e "verbose=$verbose\nplaylist file=$PLAYLIST_FILE"
 fi
 
 
