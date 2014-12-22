@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Plays videos from playlist
+# Plays files and STRM files from a playlist
 #
 # Copyright Â© 2013 Janne Enberg http://lietu.net/
 # This work is free. You can redistribute it and/or modify it under the
@@ -20,7 +20,7 @@ PLAYER="omxplayer"
 PLAYER_OPTIONS=""
 
 # Where is the playlist
-PLAYLIST_FILE="/home/pi/.playlist"
+PLAYLIST_FILE="/var/omxplayer_playlist_player/playlist"
 
 
 while getopts "h?vf" opt; do
@@ -51,10 +51,10 @@ fi
 
 # Process playlist contents
 while [ true ]; do
-        # Sleep a bit so it's possible to kill this
+        # Sleep a bit so its possible to kill this
         sleep 1
 
-        # Do nothing if the playlist doesn't exist
+        # Do nothing if the playlist doesnt exist
         if [ ! -f "${PLAYLIST_FILE}" ]; then
                 echo "Playlist file ${PLAYLIST_FILE} not found"
                 continue
@@ -62,11 +62,6 @@ while [ true ]; do
 
         # Get the top of the playlist
         file=$(cat "${PLAYLIST_FILE}" | head -n1)
-
-        # And strip it off the playlist file
-#        cat "${PLAYLIST_FILE}" | tail -n+2 > "${PLAYLIST_FILE}.new"
-#	echo "$file" >> "${PLAYLIST_FILE}.new"
-#        mv "${PLAYLIST_FILE}.new" "${PLAYLIST_FILE}"
 
         # Skip if this is empty
         if [ -z "${file}" ]; then
@@ -87,20 +82,20 @@ while [ true ]; do
         echo
         echo "Playing ${file} ..."
         echo
-	
-	stream=$(cat "$file")
-	echo
-	echo "Stream ${stream} ..."
-	echo
+        
+        stream=$(cat "$file")
+        echo
+        echo "Stream ${stream} ..."
+        echo
 
-	filename=$(basename "$file")
-	extension="${filename##*.}"
+        filename=$(basename "$file")
+        extension="${filename##*.}"
         filename=${filename%.*}
         echo
         echo "ext ${extension} ..."
         echo
         if [ `echo $extension | tr [:upper:] [:lower:]` =  `echo strm | tr [:upper:] [:lower:]` ]; then
-	       play=$(cat "$file")
+               play=$(cat "$file")
         else
                 play=$file
         fi
@@ -108,15 +103,15 @@ while [ true ]; do
         echo "Hi ${file} ..."
         echo
 
-        /home/pi/speech.sh "Now playing ${filename}"
-	"${PLAYER}" ${PLAYER_OPTIONS} "${play}" || true
+        googletts "Now playing ${filename}"
+        "${PLAYER}" ${PLAYER_OPTIONS} "${play}" || true
 
         echo
         echo "Playback complete, continuing to next item on playlist."
         echo
 
 
-        # Sleep a bit so it's possible to kill this
+        # Sleep a bit so its possible to kill this
         sleep 1
 
         # And strip it off the playlist file
